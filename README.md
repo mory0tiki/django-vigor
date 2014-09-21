@@ -1,0 +1,4 @@
+django-viger
+============
+
+django-vigor

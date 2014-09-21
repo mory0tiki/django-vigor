@@ -7,7 +7,7 @@ import base64
 from os import path
 from uuid import uuid4
 
-from djanog.conf.settings import TEMP_DIR
+from django.conf.settings import TEMP_DIR
 
 
 def save_file_to_temp(data, *args, **kwargs):

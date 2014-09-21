@@ -17,7 +17,7 @@ from django.views.generic import base
 from django.views.generic.base import TemplateView
 from rest_framework.renderers import JSONRenderer
 
-from GnomicParking import settings
+from django.conf import settings
 from vigor.generic.utils.file import save_file_to_temp
 from vigor.generic.utils.http import JsonResponseStruct, render_post_params
 from vigor.generic.utils.util import get_column_name

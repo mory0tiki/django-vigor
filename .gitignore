@@ -52,3 +52,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#Vim swip file
+*.swp
+*.swo

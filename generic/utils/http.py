@@ -27,19 +27,11 @@ class JsonResponseStruct:
 def render_post_params(request, *args, **kwargs):
         result = None;
         try:
-            if request.method == "POST":
-                if request.POST is None or not request.POST:
-                    if request.body:
-                        result = ast.literal_eval(request.body)
-                else:
-                    result = request.POST#ast.literal_eval(str(request.POST.dict()))
-            elif request.method == "PUT":
-                if request.body:
-                    result = ast.literal_eval(request.body);
-                else:
-                    result = request.PUT
+            if request.is_ajax() or request.method != "POST":
+                result = ast.literal_eval(request.body)
             else:
-                result = ast.literal_eval(request.body);
+                if request.method == "POST":
+                    result = request.POST#ast.literal_eval(str(request.POST.dict()))
         except Exception as ex:
             print ex;
             return None

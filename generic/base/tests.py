@@ -32,7 +32,7 @@ class CRUDTestCase():
     def setUp( self ):
         create_user()
         self.client = Client()
-        self.client.post(self.login_url, data = {'username': 'test_user', 'password': '123456'})
+        self.client.post(self.login_url, data = {'username': 'test_user@local.com', 'password': '123456'})
         response = self.client.post(self.main_url, data=self.setup_data_entry)
     
     def test_adding(self):
@@ -42,7 +42,6 @@ class CRUDTestCase():
         
     def test_readinges_list(self):
         response = self.client.get(self.main_url)
-        
         result = json.loads(response.content)
         self.assertGreater(len(result['data']), 0, Colorify.fail('Reading Box failed in  %s - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))
     
@@ -61,7 +60,6 @@ class CRUDTestCase():
         
         result = json.loads(response.content)
         self.assertGreater(len(result['data']), 0, Colorify.fail('Deleting failed in %s - doesn\'t exist any entry - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))
-        
         response = self.client.delete(self.main_url + '%s/' % (result['data'][0]['id']))
         result = json.loads(response.content)
         self.assertFalse(result['hasError'], Colorify.fail('Failed to delete in %s - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))

@@ -155,12 +155,12 @@ class CrudBasicView(View):
 
         return HttpResponse(self.response);
 
-    def pre_read(self, id):
+    def pre_read(self, request, id, *args, **kwargs):
         """
         """
         return True
 
-    def post_read(self, id):
+    def post_read(self, request, id, *args, **kwargs):
         """
         """
         return True
@@ -169,8 +169,7 @@ class CrudBasicView(View):
 
         try:
             self.response = JsonResponseStruct()
-            self.pre_read(id)
-
+            self.pre_read(request, id, *args, **kwargs)
             if id:
                 obj = self.model.objects.filter(self.serializerFilter).get(id=id)
 
@@ -200,7 +199,7 @@ class CrudBasicView(View):
                 self.response.message = "";
             # else:
             #                     raise Exception(upper(self.name) + "_IS_NOT_EXIST");
-            self.post_read(id)
+            self.post_read(request, id, *args, **kwargs)
         except Exception as ex:
             self.response.extraMessage = unicode(ex)
             self.response.message = upper(self.name) + "_READ_FAILD";

@@ -199,7 +199,7 @@ class CrudBasicView(View):
                 self.response.pagination['total_rows'] = paginator.count
                 self.response.pagination['current_page'] = pageNo
                 self.response.pagination['start_index'] = page.start_index()
-                self.response.pagination['end_index'] = page.end_index()
+                self.response.pagination['last_index'] = page.end_index()
 
                 self.response.hasError = False;
                 self.response.errorCode = 200;

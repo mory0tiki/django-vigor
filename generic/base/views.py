@@ -181,19 +181,26 @@ class CrudBasicView(View):
                     self.response.message = "";
             else:
                 objs = self.model.objects.filter(self.serializerFilter)
-                paginator = Paginator(objs, settings.PAGE_ROW_NO)
                 pageNo = request.GET.get('page');
-
+                paginator = Paginator(objs, settings.PAGE_ROW_NO if pageNo != -1 else objs.count())
+                
                 try:
                     page = paginator.page(pageNo);
                 except PageNotAnInteger:
                     page = paginator.page(1);
                 except EmptyPage:
                     page = paginator.page(paginator.num_pages);
-
+                
                 # if objs:
                 objsSerializer = self.serializer(page, many=True);
                 self.response.data = json.loads(JSONRenderer().render(objsSerializer.data));
+                # Adding pagination info to our response
+                self.response.pagination['num_pages'] = paginator.num_pages
+                self.response.pagination['total_rows'] = paginator.count
+                self.response.pagination['current_page'] = pageNo
+                self.response.pagination['start_index'] = page.start_index()
+                self.response.pagination['end_index'] = page.end_index()
+
                 self.response.hasError = False;
                 self.response.errorCode = 200;
                 self.response.message = "";

@@ -40,8 +40,9 @@ class CRUDTestCase():
         result = json.loads(response.content)
         self.assertFalse(result['hasError'], Colorify.fail('Adding failed in %s - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))
         
-    def test_readinges_list(self):
-        response = self.client.get(self.main_url)
+    def test_reading_list(self):
+        response = self.client.get(self.main_url + '?page=-1')
+        print response.content
         result = json.loads(response.content)
         self.assertGreater(len(result['data']), 0, Colorify.fail('Reading Box failed in  %s - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))
     
@@ -57,7 +58,6 @@ class CRUDTestCase():
     
     def test_delete(self):
         response = self.client.get(self.main_url)
-        
         result = json.loads(response.content)
         self.assertGreater(len(result['data']), 0, Colorify.fail('Deleting failed in %s - doesn\'t exist any entry - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))
         response = self.client.delete(self.main_url + '%s/' % (result['data'][0]['id']))

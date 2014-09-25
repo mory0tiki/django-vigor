@@ -13,6 +13,24 @@ def get_model_fields(model, excluded_fields = []):
 def get_model_m2m_fields(model):
     return [x.column for x in model._meta.many_to_manys]
 
+
+def get_related_model(model):
+    """
+        returns all one-to-many related models of the model
+
+        return: a dict with model's name as key 
+    """
+    related_models = {}
+    try:
+        for field in model._meta.fields:
+            if field.get_internal_type() == 'ForeignKey':
+                rel = field.rel.to
+                related_models[rel._meta.model_name] = rel
+    except Exception as ex:
+        raise ex
+    return related_models
+
+
 def get_column_name(model, field):
     tmp = [x.column for x in model._meta.fields if x.name == field or x.column == field]
     if tmp:

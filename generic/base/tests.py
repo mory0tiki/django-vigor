@@ -68,7 +68,7 @@ class CRUDTestCase():
         result = json.loads(response.content)
         self.assertGreater(len(result['data']), 0, Colorify.fail('Updating failed in %s - doesn\'t exist any entry - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))
         obj = result['data'][0]
-        obj[self.put_field_name] += ' - updated'
+        obj[self.put_field_name] = (obj[self.put_field_name] if obj[self.put_field_name] else "field is ") + ' - updated'
         if self.put_excepted_filed:
             obj.pop(self.put_excepted_filed)
         response = self.client.put(self.main_url + '%s/' % (obj['id']), data = obj)

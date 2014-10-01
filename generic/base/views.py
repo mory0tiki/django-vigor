@@ -96,7 +96,8 @@ class CrudBasicView(View):
         try:
             data = render_post_params(request);
             if data and id:
-                obj = self.model.objects.get(id=id)
+                self.set_filters(request, *args, **kwargs)
+                obj = self.model.objects.filter(self.serializerFilter).get(id=id)
                 if obj:
                     if len(self.putModelField) > 0:
                         for field in self.putModelField:
@@ -120,7 +121,8 @@ class CrudBasicView(View):
 
         try:
             if id:
-                obj = self.model.objects.get(id=id);
+                self.set_filters(request, *args, **kwargs)
+                obj = self.model.objects.filter(self.serializerFilter).get(id=id);
                 if obj:
                     obj.delete();
                     self.response.errorCode = 200;
@@ -133,7 +135,13 @@ class CrudBasicView(View):
             self.response.message = upper(self.name) + "_DELETE_FAILD";
 
         return HttpResponse(self.response);
-
+    
+    def pre_create(self, request, *args, **kwargs):
+        pass
+    
+    def post_create(self, request, *args, **kwargs):
+        pass
+    
     def post(self, request, *args, **kwargs):
 
         try:
@@ -146,7 +154,9 @@ class CrudBasicView(View):
                         if hasattr(obj, column) and (field in data):
                             setattr(obj, column, save_file_to_temp(data[field])) if field in self.fileModelField else setattr(obj, column, data[field])
                     if self.validate(data, obj=obj):
+                        self.pre_create(request, obj=obj, *args, **kwargs)
                         obj.save();
+                        self.post_create(request, obj=obj, *args, **kwargs)
                         self.response.message = upper(self.name) + "_ADDED_SUCCESSFULLY"
                         if self.callbackUrl and self.callbackUrl.has_key('post'):
                             self.response.callbackUrl = self.callbackUrl['post'] + str(obj.id);
@@ -174,6 +184,7 @@ class CrudBasicView(View):
             self.response = JsonResponseStruct()
             self.pre_read(request, id, *args, **kwargs)
             if id:
+                self.set_filters(request, *args, **kwargs)
                 obj = self.model.objects.filter(self.serializerFilter).get(id=id)
 
                 if obj:
@@ -223,6 +234,8 @@ class CrudBasicView(View):
         """
         return True
     
+    def set_filters(self, request, *args, **kwargs):
+        pass
     
 class StaticView(TemplateView):
     '''

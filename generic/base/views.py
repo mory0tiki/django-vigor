@@ -196,7 +196,7 @@ class CrudBasicView(View):
             else:
                 objs = self.model.objects.filter(self.serializerFilter)
                 pageNo = request.GET.get('page');
-                paginator = Paginator(objs, settings.PAGE_ROW_NO if pageNo != -1 else objs.count())
+                paginator = Paginator(objs, settings.PAGE_ROW_NO if pageNo != '-1' else objs.count())
                 
                 try:
                     page = paginator.page(pageNo);
@@ -211,7 +211,7 @@ class CrudBasicView(View):
                 # Adding pagination info to our response
                 self.response.pagination['num_pages'] = paginator.num_pages
                 self.response.pagination['total_rows'] = paginator.count
-                self.response.pagination['current_page'] = pageNo
+                self.response.pagination['current_page'] = pageNo if pageNo != '-1' else 1
                 self.response.pagination['start_index'] = page.start_index()
                 self.response.pagination['last_index'] = page.end_index()
 

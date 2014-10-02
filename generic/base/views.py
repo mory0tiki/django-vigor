@@ -39,8 +39,8 @@ class View(base.View):
     def initResponse(self):
         pass;
 
-#    @ensure_csrf_cookie
-    @csrf_exempt
+#@ensure_csrf_cookie
+#    @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         # Try to dispatch to the right method; if a method doesn't exist,
         # defer to the error handler. Also defer to the error handler if the
@@ -242,9 +242,13 @@ class CrudBasicView(View):
         params['GET'] =  self.getModelField
         params['POST'] = self.postModelField
         params['PUT'] = self.putModelField
+        self.response.data = params
+        self.response.hasError = False
+        self.response.message = 'DATA_STRUCTURES'
+        self.response.message = 200
 
-        return HttpResponse(params)
-    
+        return HttpResponse(self.response)
+
 class StaticView(TemplateView):
     '''
     A class-base view that handles for serving static html files 

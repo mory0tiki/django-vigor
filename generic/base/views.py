@@ -236,6 +236,14 @@ class CrudBasicView(View):
     
     def set_filters(self, request, *args, **kwargs):
         pass
+
+    def options(self, request, *args, **kwargs):
+        params = {}
+        params['GET'] =  self.getModelField
+        params['POST'] = self.postModelField
+        params['PUT'] = self.putModelField
+
+        return HttpResponse(params)
     
 class StaticView(TemplateView):
     '''

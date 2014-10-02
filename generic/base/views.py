@@ -242,9 +242,13 @@ class CrudBasicView(View):
         params['GET'] =  self.getModelField
         params['POST'] = self.postModelField
         params['PUT'] = self.putModelField
+        self.response.data = params
+        self.response.hasError = False
+        self.response.message = 'DATA_STRUCTURES'
+        self.response.message = 200
 
-        return HttpResponse(params)
-    
+        return HttpResponse(self.response)
+
 class StaticView(TemplateView):
     '''
     A class-base view that handles for serving static html files 

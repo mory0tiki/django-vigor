@@ -10,6 +10,7 @@ from string import upper, lower
 from django.core.files import File 
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
 from django.db.models import Q
+from django.utils.decorators import method_decorator
 from django.http.response import HttpResponse, Http404
 from django.middleware.csrf import get_token
 from django.template.base import TemplateDoesNotExist
@@ -39,8 +40,8 @@ class View(base.View):
     def initResponse(self):
         pass;
 
-#@ensure_csrf_cookie
 #    @csrf_exempt
+    @method_decorator(ensure_csrf_cookie)
     def dispatch(self, request, *args, **kwargs):
         # Try to dispatch to the right method; if a method doesn't exist,
         # defer to the error handler. Also defer to the error handler if the

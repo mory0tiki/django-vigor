@@ -107,6 +107,8 @@ class CrudBasicView(View):
                                 setattr(obj, column, File(open(save_file_to_temp(data[field]), 'r'))) if field in self.fileModelField else setattr(obj, column, data[field])
                         if self.validate(data, obj=obj):
                             obj.save()
+                            self.data = json.loads(JSONRenderer().render(self.serializer(obj).data))
+                            self.response.errorCode = 200
                             self.response.hasError = False
                             self.response.message = upper(self.name) + "_UPDATED_SUCCESSFULLY";
                 else:
@@ -158,10 +160,13 @@ class CrudBasicView(View):
                         self.pre_create(request, obj=obj, *args, **kwargs)
                         obj.save();
                         self.post_create(request, obj=obj, *args, **kwargs)
+                        self.data = json.loads(JSONRenderer().render(self.serializer(obj).data))
+                        self.response.errorCode = 200
                         self.response.message = upper(self.name) + "_ADDED_SUCCESSFULLY"
                         if self.callbackUrl and self.callbackUrl.has_key('post'):
                             self.response.callbackUrl = self.callbackUrl['post'] + str(obj.id);
                         self.response.hasError = False;
+                        self.response.errorCode = 200
 
         except Exception, ex:
             self.response.extraMessage = unicode(ex);

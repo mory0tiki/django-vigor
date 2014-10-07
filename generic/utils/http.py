@@ -35,10 +35,10 @@ def render_post_params(request, *args, **kwargs):
         result = None
         try:
             if request.is_ajax() or request.method != "POST":
-                result = ast.literal_eval(request.body)
+                result = ast.literal_eval(request.body)["data"]
             else:
                 if request.method == "POST":
-                    result = request.POST#ast.literal_eval(str(request.POST.dict()))
+                    result = request.POST.dict()["data"]#ast.literal_eval(str(request.POST.dict()))
         except Exception as ex:
             print ex
             return None

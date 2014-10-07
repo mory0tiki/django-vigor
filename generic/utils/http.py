@@ -34,12 +34,14 @@ class JsonResponseStruct:
 def render_post_params(request, *args, **kwargs):
         result = None
         try:
-            if request.is_ajax() or request.method != "POST":
-                result = ast.literal_eval(request.body)["data"]
-            else:
-                if request.method == "POST":
-                    result = request.POST.dict()#ast.literal_eval(str(request.POST.dict()))
-                    print result
+            result = ast.literal_eval(request.body)
+
+#            if request.is_ajax() or request.method != "POST":
+#                result = ast.literal_eval(request.body)["data"]
+#            else:
+#                if request.method == "POST":
+#                    result = request.POST.dict()#ast.literal_eval(str(request.POST.dict()))
+#                    print result
         except Exception as ex:
             print ex
             return None

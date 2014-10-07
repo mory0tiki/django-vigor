@@ -10,6 +10,7 @@ from string import upper, lower
 from django.core.files import File 
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
 from django.db.models import Q
+from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist 
 from django.utils.decorators import method_decorator
 from django.http.response import HttpResponse, Http404
@@ -230,24 +231,25 @@ class CrudBasicView(View):
 
         try:
             data = render_post_params(request);
-            if data:
-                obj = self.model();
-                if len(self.postModelField) > 0:
-                    for field in self.postModelField:
-                        column = get_column_name(self.model, field)
-                        if hasattr(obj, column) and (field in data):
-                            setattr(obj, column, save_file_to_temp(data[field])) if field in self.fileModelField else setattr(obj, column, data[field])
-                    if self.validate(data, obj=obj):
-                        self.pre_create(request, obj=obj, data=data, *args, **kwargs)
-                        obj.save();
-                        self.post_create(request, obj=obj, data=data, *args, **kwargs)
-                        self.data = json.loads(JSONRenderer().render(self.serializer(obj).data))
-                        self.response.errorCode = 200
-                        self.response.message = upper(self.name) + "_ADDED_SUCCESSFULLY"
-                        if self.callbackUrl and self.callbackUrl.has_key('post'):
-                            self.response.callbackUrl = self.callbackUrl['post'] + str(obj.id);
-                        self.response.hasError = False;
-                        self.response.errorCode = 200
+            with transaction.atomic():
+                if data:
+                    obj = self.model();
+                    if len(self.postModelField) > 0:
+                        for field in self.postModelField:
+                            column = get_column_name(self.model, field)
+                            if hasattr(obj, column) and (field in data):
+                                setattr(obj, column, save_file_to_temp(data[field])) if field in self.fileModelField else setattr(obj, column, data[field])
+                        if self.validate(data, obj=obj):
+                            self.pre_create(request, obj=obj, data=data, *args, **kwargs)
+                            obj.save();
+                            self.post_create(request, obj=obj, data=data, *args, **kwargs)
+                            self.data = json.loads(JSONRenderer().render(self.serializer(obj).data))
+                            self.response.errorCode = 200
+                            self.response.message = upper(self.name) + "_ADDED_SUCCESSFULLY"
+                            if self.callbackUrl and self.callbackUrl.has_key('post'):
+                                self.response.callbackUrl = self.callbackUrl['post'] + str(obj.id);
+                            self.response.hasError = False;
+                            self.response.errorCode = 200
 
         except Exception, ex:
             self.response.extraMessage = unicode(ex);

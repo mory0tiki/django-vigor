@@ -38,7 +38,7 @@ def render_post_params(request, *args, **kwargs):
                 result = ast.literal_eval(request.body)
             else:
                 if request.method == "POST":
-                    result = request.POST#ast.literal_eval(str(request.POST.dict()))
+                    result = request.POST.dict()#ast.literal_eval(str(request.POST.dict()))
         except Exception as ex:
             print ex
             return None

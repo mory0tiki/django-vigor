@@ -10,6 +10,7 @@ from string import upper, lower
 from django.core.files import File 
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist 
 from django.utils.decorators import method_decorator
 from django.http.response import HttpResponse, Http404
 from django.middleware.csrf import get_token
@@ -56,6 +57,86 @@ class View(base.View):
         # Reset response variable
         self.initResponse()
         return handler(request, *args, **kwargs)
+
+class BasicCheckExistance(View):
+    name= None
+    model = None
+    field_for_check = {}
+
+    response = JsonResponseStruct()
+
+    # Re-initialize response variable in each request
+    # to clear previews data.
+    def initResponse(self):
+        self.response = JsonResponseStruct();
+        self.response.hasError = True;
+        self.response.message = "REQUEST_IS_NOT_VALID";
+
+    def post(self, request, *args, **kwargs):
+        try:
+            self.field_for_check = render_post_params(request)
+            self.model.objects.get(**self.field_for_check)
+            self.response.hasError = False
+            self.response.message = None
+            self.response.data = {"is_exist": True}
+        except self.model.DoesNotExist as ex:
+            self.response.hasError = False
+            self.response.message = None
+            self.response.data = {"is_exist": False}
+            self.response.errorCode = 404
+        except Exception as ex:
+            self.response.message = "%s_CHECK_FAILD" % ( self.name)
+            self.response.extraMessage = str(ex)
+            self.errorCode = 500
+        return HttpResponse(self.response)
+
+class BasicSearchView(View):
+
+    name = None
+    model_serializer = {}
+    conditions = {}
+
+    response = JsonResponseStruct()
+
+    # Re-initialize response variable in each request
+    # to clear previews data.
+    def initResponse(self):
+        self.response = JsonResponseStruct();
+        self.response.hasError = True;
+        self.response.message = "REQUEST_IS_NOT_VALID";
+
+    def set_conditions(self, request, *args, **kwargs):
+        pass
+
+    def post(self, request, *args, **kwargs):
+        self.response.data = {}
+        try:
+            self.set_conditions(request, *args, **kwargs)
+            if len(self.conditions):
+                for model in self.model_serializer:
+                    obj = model.objects.filter(self.conditions[model.__name__])
+                    obj_serializer = self.model_serializer[model](obj, many=True)
+                    print obj_serializer.data
+                    if obj_serializer.data:
+                        self.response.data[model.__name__] = json.loads(JSONRenderer().render(obj_serializer.data))
+                    self.response.hasError = False
+                    self.response.message = None
+                    self.response.errorCode = 200
+            else:
+                self.response.data = {}
+                self.response.hasError = False
+                self.response.message = None
+                self.response.errorCode = 200
+#        except ObjectDoesNotExist as ex:
+#                self.response.data = {}
+#                self.response.hasError = False
+#                self.response.message = None
+#                self.response.errorCode = 200
+        except Exception as ex:
+                self.response.message = "%s_SEARCH_FAILED" % (self.name)
+                self.response.extraMessage = str(ex)
+        return HttpResponse(self.response)
+
 
 
 class CrudBasicView(View):

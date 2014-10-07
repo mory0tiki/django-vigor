@@ -34,6 +34,7 @@ class JsonResponseStruct:
 def render_post_params(request, *args, **kwargs):
         result = None
         try:
+            print request.body
             result = ast.literal_eval(request.body)
 
 #            if request.is_ajax() or request.method != "POST":

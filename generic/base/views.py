@@ -238,9 +238,9 @@ class CrudBasicView(View):
                         if hasattr(obj, column) and (field in data):
                             setattr(obj, column, save_file_to_temp(data[field])) if field in self.fileModelField else setattr(obj, column, data[field])
                     if self.validate(data, obj=obj):
-                        self.pre_create(request, obj=obj, *args, **kwargs)
+                        self.pre_create(request, obj=obj, data=data, *args, **kwargs)
                         obj.save();
-                        self.post_create(request, obj=obj, *args, **kwargs)
+                        self.post_create(request, obj=obj, data=data, *args, **kwargs)
                         self.data = json.loads(JSONRenderer().render(self.serializer(obj).data))
                         self.response.errorCode = 200
                         self.response.message = upper(self.name) + "_ADDED_SUCCESSFULLY"

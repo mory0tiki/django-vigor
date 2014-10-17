@@ -47,4 +47,17 @@ def render_post_params(request, *args, **kwargs):
             print ex
             return None
         return result
-    
+   
+
+try:
+        from django.utils.encoding import smart_unicode as smart_text
+except ImportError:
+        from django.utils.encoding import smart_text
+import re
+import unicodedata
+def slugify(value):
+    #underscore, tilde and hyphen are alowed in slugs
+    value = unicodedata.normalize('NFKC', smart_text(value))
+    prog = re.compile(r'[^~\w\s-]', flags=re.UNICODE)
+    value = prog.sub('', value).strip().lower()
+    return re.sub(r'[-\s]+', '-', value)

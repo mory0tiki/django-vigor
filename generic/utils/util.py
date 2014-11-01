@@ -52,3 +52,23 @@ def pagination (query_set, records_per_page, page_no):
     
     return page
 
+
+class HashKeyGenerator:
+    '''
+    This class is used to create a sha key 
+    from username
+    '''
+    
+    import logging
+    
+    logger = logging.getLogger();
+    def generateKey(self, inputStr):
+        import random, sha
+        
+        try:
+            salt = sha.new(str(random.random())).hexdigest()[:5]
+            activation_key = sha.new(salt+inputStr).hexdigest();
+        except Exception as ex:
+#             self.logger.error(str(ex));
+            return None;
+        return activation_key

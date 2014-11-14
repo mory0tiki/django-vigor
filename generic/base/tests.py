@@ -33,9 +33,13 @@ class CRUDTestCase():
         create_user()
         self.client = Client()
         self.client.post(self.login_url, data = {'username': 'test_user@local.com', 'password': '123456'})
-        response = self.client.post(self.main_url, data=self.setup_data_entry)
+        if self.setup_data_entry:
+            response = self.client.post(self.main_url, data=self.setup_data_entry)
     
     def test_adding(self):
+        if not self.post_data:
+            self.assertFalse(False, "POST data is not set")
+            return
         response = self.client.post(self.main_url, data=self.post_data)
         result = json.loads(response.content)
         self.assertFalse(result['hasError'], Colorify.fail('Adding failed in %s - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))
@@ -64,6 +68,9 @@ class CRUDTestCase():
         self.assertFalse(result['hasError'], Colorify.fail('Failed to delete in %s - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))
     
     def test_update(self):
+        if not self.put_field_name:
+            self.assertFalse(False, "POST data is not set")
+            return
         response = self.client.get(self.main_url)
         result = json.loads(response.content)
         self.assertGreater(len(result['data']), 0, Colorify.fail('Updating failed in %s - doesn\'t exist any entry - Ex: %s # %s' % (self.test_name, result['message'], result['extraMessage'])))

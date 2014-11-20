@@ -4,6 +4,20 @@ Created on Sep 5, 2014
 @author: morteza
 '''
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.conf import settings
+import json
+
+
+
+def load_translation_file():
+    try:
+        trans = open(settings.STATICFILES_DIRS[0] + ("/translations/translate_%s.json" % (settings.LANGUAGE_CODE)))
+        return json.load(trans);
+    except Exception as ex:
+#         logger.error(str(ex));
+        print str(ex)
+        raise
+
 def get_model_colums(model, excluded_fields = []):
     return [x.column for x in model._meta.fields if x.column not in excluded_fields]
 
@@ -52,6 +66,11 @@ def pagination (query_set, records_per_page, page_no):
     
     return page
 
+def validate_request_data(data, key_list, *args, **kwargs):
+    for k in key_list:
+        if not data.has_key(k):
+            raise Exception(load_translation_file('VALUE_NOT_EXIST' % (k)))   
+
 
 class HashKeyGenerator:
     '''
@@ -72,3 +91,5 @@ class HashKeyGenerator:
 #             self.logger.error(str(ex));
             return None;
         return activation_key
+
+
